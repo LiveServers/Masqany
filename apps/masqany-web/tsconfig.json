@@ -1,0 +1,19 @@
+{
+    "extends": ["@masqany/tsconfig/base.json"],
+    "include": ["**/*.ts", "**/*.tsx", "../../decls/*.ts"],
+    "exclude": ["vite.config.ts", "sb-vite.config.ts"],
+    "compilerOptions": {
+        "lib": ["DOM", "DOM.Iterable", "ES2022"],
+        "types": ["@remix-run/node", "vite/client"],
+        "target": "ES2022",
+        "baseUrl": ".",
+        "paths": {
+            "ui/*": ["./src/ui/*"],
+            "utils/*": ["./src/utils/*"],
+            "app/*": ["./src/app/*"],
+            "types/*": ["./src/types/*"],
+            "core/*": ["./src/core/*"],
+            "config/*": ["./src/config/*"],
+        }
+    }
+}

@@ -1,0 +1,53 @@
+{
+  "name": "masqany-web",
+  "version": "1.0.0",
+  "description": "Web client built with remix",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Brian Kyole Mwau",
+  "license": "ISC",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@radix-ui/themes": "3.1.6",
+    "@remix-run/node": "2.15.2",
+    "@remix-run/react": "2.15.2",
+    "@remix-run/serve": "2.15.2",
+    "@tanstack/query-sync-storage-persister": "5.62.16",
+    "@tanstack/react-query": "5.62.16",
+    "@tanstack/react-query-persist-client": "5.62.16",
+    "@vitejs/plugin-react": "4.3.4",
+    "autoprefixer": "10.4.20",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "dotenv": "16.4.7",
+    "isbot": "4.4.0",
+    "postcss": "8.4.49",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "remix-auth": "4.1.0",
+    "remix-flat-routes": "0.6.5",
+    "remix-hook-form": "6.1.2",
+    "tailwind-merge": "2.6.0",
+    "tailwindcss": "3.4.17",
+    "tailwindcss-animate": "1.0.7",
+    "uuid": "11.0.4",
+    "zod": "3.24.1"
+  },
+  "devDependencies": {
+    "@masqany/tsconfig": "1.0.0",
+    "@masqany/eslint": "1.0.0",
+    "@remix-run/dev": "2.15.2",
+    "happy-dom": "16.3.0",
+    "prettier": "3.4.2",
+    "prettier-plugin-tailwindcss": "0.6.9",
+    "typescript": "5.7.2",
+    "vite": "5.4.11",
+    "vite-tsconfig-paths": "5.1.4",
+    "vitest": "2.1.8"
+  },
+  "engines": {
+    "node": "20.17.0"
+  }
+}

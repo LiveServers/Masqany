@@ -1,0 +1,30 @@
+{
+  "name": "masqany",
+  "version": "1.0.0",
+  "description": "Masqany is a rental management SAAS",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Brian Kyole Mwau",
+  "license": "ISC",
+  "devDependencies": {
+    "pino": "9.6.0",
+    "prettier": "3.4.2",
+    "tsx": "4.19.2",
+    "turbo": "2.3.3"
+  },
+  "workspaces": [
+    "apps/*",
+    "shared/*",
+    "tooling/*"
+  ],
+  "private": true,
+  "packageManager": "npm@9.6.7",
+  "engines": {
+    "node": "20.17.0"
+  }
+}

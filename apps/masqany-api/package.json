@@ -1,0 +1,44 @@
+{
+  "name": "masqany-api",
+  "version": "1.0.0",
+  "description": "Backend ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs": "open http://localhost:3000/docs",
+    "lint": "eslint src",
+    "lint:fix": "npm run lint --fix",
+    "start": "dotenv run -- node dist/index.js",
+    "typecheck": "tsc"
+  },
+  "type": "module",
+  "author": "Brian Kyole Mwau",
+  "license": "ISC",
+  "eslintConfig": {
+    "extends": "@masqany/eslint/node"
+  },
+  "engines": {
+    "node": "20.17.0"
+  },
+  "devDependencies": {
+    "@masqany/eslint": "1.0.0",
+    "@masqany/tsconfig": "1.0.0",
+    "@types/node": "22.10.5",
+    "esbuild": "0.24.2",
+    "esbuild-plugin-pino": "2.2.1",
+    "globby": "14.0.2",
+    "pino": "9.6.0",
+    "pino-pretty": "13.0.0",
+    "typescript": "5.7.2"
+  },
+  "dependencies": {
+    "@t3-oss/env-core": "0.11.1",
+    "@ts-rest/core": "3.51.0",
+    "@ts-rest/fastify": "3.51.0",
+    "@ts-rest/open-api": "3.51.0",
+    "close-with-grace": "2.1.0",
+    "date-fns": "4.1.0",
+    "encore.dev": "1.45.4",
+    "zod": "3.24.1"
+  }
+}
