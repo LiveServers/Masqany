@@ -12,6 +12,7 @@
   "author": "Brian Kyole Mwau",
   "license": "ISC",
   "devDependencies": {
+    "@dotenvx/dotenvx": "1.33.0",
     "pino": "9.6.0",
     "prettier": "3.4.2",
     "tsx": "4.19.2",
