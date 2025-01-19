@@ -13,11 +13,11 @@ export default defineConfig(() => {
         },
         plugins: [
             remix({
-                appDirectory: './src/app',
+                appDirectory: './app',
                 ignoredRouteFiles: ['**/.*'],
                 routes: async (defineRoutes) => {
                     return flatRoutes('routes', defineRoutes, {
-                        appDir: './src/app',
+                        appDir: './app',
                         ignoredRouteFiles: [
                             '.*', 
                             '**/*.css', 

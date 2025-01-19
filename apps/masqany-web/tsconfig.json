@@ -1,7 +1,13 @@
 {
     "extends": ["@masqany/tsconfig/base.json"],
-    "include": ["**/*.ts", "**/*.tsx", "../../decls/*.ts"],
-    "exclude": ["vite.config.ts", "sb-vite.config.ts"],
+    "include": [
+        "**/*.ts",
+        "**/*.tsx",
+        "**/.server/**/*.ts",
+        "**/.server/**/*.tsx",
+        "**/.client/**/*.ts",
+        "**/.client/**/*.tsx"
+      ],
     "compilerOptions": {
         "lib": ["DOM", "DOM.Iterable", "ES2022"],
         "types": ["@remix-run/node", "vite/client"],
@@ -10,10 +16,13 @@
         "paths": {
             "ui/*": ["./src/ui/*"],
             "utils/*": ["./src/utils/*"],
-            "app/*": ["./src/app/*"],
+            "app/*": ["app/*"],
             "types/*": ["./src/types/*"],
             "core/*": ["./src/core/*"],
             "config/*": ["./src/config/*"],
-        }
+        },
+    // Remix takes care of building everything in `remix build`.
+    "noEmit": true
     }
 }
+  
