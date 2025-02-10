@@ -9,6 +9,7 @@ export const meta: MetaFunction = () => {
         title: 'Masqany Rental Property Management'
     }]
 }
+
 export const link: LinksFunction = () => [
     {rel: 'stylesheet', href: stylesheet},
     {rel: 'icon', href: '/favicon-masqany.png', type: 'image/png'}
@@ -37,10 +38,5 @@ export default function App() {
 }
 
 export function ErrorBoundary() {
-    return (
-        <>
-        <link rel="stylesheet" type="text/css" href={stylesheet} />
-        <h1>An error occured</h1>
-        </>
-    )
+    return <h1>An error occured</h1>;
 }

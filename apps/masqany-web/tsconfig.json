@@ -14,12 +14,12 @@
         "target": "ES2022",
         "baseUrl": ".",
         "paths": {
-            "ui/*": ["./src/ui/*"],
-            "utils/*": ["./src/utils/*"],
+            "ui/*": ["./ui/*"],
+            // "utils/*": ["./src/utils/*"],
             "app/*": ["app/*"],
-            "types/*": ["./src/types/*"],
-            "core/*": ["./src/core/*"],
-            "config/*": ["./src/config/*"],
+            // "types/*": ["./src/types/*"],
+            // "core/*": ["./src/core/*"],
+            // "config/*": ["./src/config/*"],
         },
     // Remix takes care of building everything in `remix build`.
     "noEmit": true
