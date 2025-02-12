@@ -1,6 +1,13 @@
 /**@type {import('eslint').Linter.Config} */
 const config = {
     root: true,
+    parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        ecmaFeatures: {
+            jsx: true
+        }
+    },
     extends: [
         'universe/web', 
         './base.js', 
@@ -10,7 +17,7 @@ const config = {
         'plugin:jsx-a11y/recommended'
     ],
     env: {
-        browser: true,
+       browser: true,
        commonjs: true,
        es6: true,
     },

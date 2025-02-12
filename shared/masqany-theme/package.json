@@ -1,0 +1,19 @@
+{
+    "name": "@masqany/theme",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "exports": {
+        "./flags/*": "./assets/flags/*",
+        "./fonts/*": "./assets/fonts/*",
+        ".": "./src/index.ts"
+    },
+    "main": "./src/index.ts",
+    "eslintConfig": {
+        "extends": "@masqany/eslint/base"
+    },
+    "devDependencies": {
+        "@masqany/eslint": "1.0.0",
+        "@masqany/tsconfig": "1.0.0"
+    }
+}
