@@ -12,6 +12,8 @@
   "author": "Brian Kyole Mwau",
   "license": "ISC",
   "devDependencies": {
+    "@masqany/eslint": "1.0.0",
+    "eslint": "8.57.1",
     "pino": "9.6.0",
     "prettier": "3.4.2",
     "tsx": "4.19.2",
