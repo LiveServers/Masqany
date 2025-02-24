@@ -1,0 +1,1 @@
+ALTER TABLE "user" ALTER COLUMN isVerified SET DEFAULT false;
