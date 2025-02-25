@@ -1,5 +1,5 @@
 import OtpService from "../otp/otp.service";
-import { CreateUserDto, UserResponse } from "./user.interface";
+import { CreateUserDto, UpdateUserDto, UserResponse } from "./user.interface";
 import { User } from "./user.model";
 
 const UserService = {
@@ -7,7 +7,6 @@ const UserService = {
     const count = await User.count();
     return count;
   },
-
   create: async (data: CreateUserDto): Promise<UserResponse> => {
     const user = await User.create(data);
     if(user){
@@ -26,25 +25,41 @@ const UserService = {
       result: user.toJSON(),
     };
   },
+  update: async (id: number, data: UpdateUserDto): Promise<UserResponse> => {
+    const user = await User.findOne({ where: { id } });
+    if (!user) {
+      return {
+        success: false,
+        message: "User not found",
+      };
+    }
+    const {firstName, lastName, role, location, phoneNumber} = data;
+    user.firstName = firstName ?? user.firstName;
+    user.lastName = lastName ?? user.lastName
+    user.role = role ?? user.role;
+    user.location = location ?? user.location;
+    user.phoneNumber = phoneNumber ?? user.phoneNumber; //TO-DO: send otp if phone number field is active
 
-  //otp
-
-//   update: async (id: number, data: UpdateUserDto): Promise<UserResponse> => {
-//     const user = await User.findOne({ where: { id } });
-//     if (!user) {
-//       return {
-//         success: false,
-//         message: "User not found",
-//       };
-//     }
-//     user.name = data.name || user.name;
-//     user.surname = data.surname || user.surname;
-//     const updated = await user.save();
-//     return {
-//       success: true,
-//       result: updated.toJSON(),
-//     };
-//   },
+    const updated = await user.save();
+    return {
+      success: true,
+      result: updated.toJSON(),
+    };
+  },
+  delete: async (id: number): Promise<UserResponse> => {
+    const user = await User.findOne({ where: { id } });
+    if (!user) {
+      return {
+        success: false,
+        message: "User not found",
+      };
+    }
+    await user.destroy();
+    return {
+      success: true,
+      result: "User deleted successfully",
+    };
+  },
 
 //   find: async (page?: number, limit?: number): Promise<UserResponse> => {
 //     let users: User[] = [];
@@ -78,20 +93,7 @@ const UserService = {
 //     };
 //   },
 
-//   delete: async (id: number): Promise<Response> => {
-//     const user = await User.findOne({ where: { id } });
-//     if (!user) {
-//       return {
-//         success: false,
-//         message: "User not found",
-//       };
-//     }
-//     await user.destroy();
-//     return {
-//       success: true,
-//       result: "User deleted successfully",
-//     };
-//   },
+
 };
 
 export default UserService;

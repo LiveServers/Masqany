@@ -44,10 +44,18 @@ export interface CreateUserDto {
     onboardingStep?: OnboardingStep;
 }
 
+export interface UpdateUserDto {
+    firstName?: string;
+    lastName?: string;
+    phoneNumber?: string; // needs otp verification
+    role?: UserRole;
+    location?: AvailableLocation;
+}
+
 export interface UserResponse {
     success: boolean;
     message?: string;
-    result?: UserDto | UserDto[];
+    result?: UserDto | UserDto[] | string;
 }
 
 export interface Response {

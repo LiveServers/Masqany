@@ -2,15 +2,17 @@ import { api, APIError } from "encore.dev/api";
 import {
   CreateUserDto,
   Response,
+  UpdateUserDto,
   UserResponse,
 } from "./user.interface";
 import UserService from "./user.service";
+import { EMAIL_REGEX } from "./utils";
 
 /**
  * Counts and returns the number of existing users
  */
 export const count = api(
-  { expose: true, method: "GET", path: "/count/users" },
+  { expose: true, method: "GET", path: "/users/v1/count" },
   async (): Promise<Response> => {
     try {
       const result = await UserService.count();
@@ -33,10 +35,49 @@ export const create = api(
       if (!data.email) {
         throw APIError.invalidArgument("Missing fields");
       }
+      if(!EMAIL_REGEX.test(data.email)){
+        throw APIError.invalidArgument("Invalid email");
+      }
       const result = await UserService.create(data);
       return result;
     } catch (error) {
       throw APIError.aborted(error?.toString() || "Error creating the user");
+    }
+  }
+);
+
+// /**
+//  * Update user data
+//  */
+export const update = api(
+  { expose: true, method: "PATCH", path: "/users/v1/:id" },
+  async ({
+    id,
+    data,
+  }: {
+    id: number;
+    data: UpdateUserDto;
+  }): Promise<UserResponse> => {
+    try {
+      const result = await UserService.update(id, data);
+      return result;
+    } catch (error) {
+      throw APIError.aborted(error?.toString() || "Error updating user");
+    }
+  }
+);
+
+/**
+ * Delete user by id
+ */
+export const destroy = api(
+  { expose: true, method: "DELETE", path: "/users/v1/:id" },
+  async ({ id }: { id: number }): Promise<UserResponse> => {
+    try {
+      const result = await UserService.delete(id);
+      return result;
+    } catch (error) {
+      throw APIError.aborted(error?.toString() || "Error deleting user");
     }
   }
 );
@@ -76,39 +117,4 @@ export const create = api(
 //     }
 //   }
 // );
-
-// /**
-//  * Update user data
-//  */
-// export const update = api(
-//   { expose: true, method: "PATCH", path: "/users/:id" },
-//   async ({
-//     id,
-//     data,
-//   }: {
-//     id: number;
-//     data: UpdateUserDto;
-//   }): Promise<UserResponse> => {
-//     try {
-//       const result = await UserService.update(id, data);
-//       return result;
-//     } catch (error) {
-//       throw APIError.aborted(error?.toString() || "Error updating user");
-//     }
-//   }
-// );
-
-// /**
-//  * Delete user by id
-//  */
-// export const destroy = api(
-//   { expose: true, method: "DELETE", path: "/users/:id" },
-//   async ({ id }: { id: number }): Promise<Response> => {
-//     try {
-//       const result = await UserService.delete(id);
-//       return result;
-//     } catch (error) {
-//       throw APIError.aborted(error?.toString() || "Error deleting user");
-//     }
-//   }
 // );
