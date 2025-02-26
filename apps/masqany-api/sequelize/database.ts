@@ -5,6 +5,11 @@ const DB = new SQLDatabase('masqany-test-db', {
   migrations: './migrations',
 });
 
-const sequelize = new Sequelize(DB.connectionString);
+const sequelize = new Sequelize(DB.connectionString, {
+  timezone: "Africa/Nairobi",
+  dialectOptions: {
+    useUTC: false
+  }
+});
 
 export { sequelize };

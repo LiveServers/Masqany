@@ -20,7 +20,7 @@ const OtpService = {
             result: data,
         };
     },
-    validateOtp: async(dto: ValidateOtpDto): Promise<OtpResponse> => {
+    validateOtp: (dto: ValidateOtpDto): OtpResponse => {
             if(dto?.otpUsed){
                 return {
                     success: false,
