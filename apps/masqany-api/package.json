@@ -23,6 +23,7 @@
   "devDependencies": {
     "@masqany/eslint": "1.0.0",
     "@masqany/tsconfig": "1.0.0",
+    "@types/jsonwebtoken": "9.0.9",
     "@types/node": "22.10.5",
     "esbuild": "0.24.0",
     "esbuild-plugin-pino": "2.2.1",
@@ -41,6 +42,7 @@
     "date-fns": "4.1.0",
     "encore.dev": "1.45.4",
     "form-data": "4.0.2",
+    "jsonwebtoken": "9.0.2",
     "mailgun.js": "11.1.0",
     "pg": "8.13.3",
     "pg-hstore": "2.3.4",

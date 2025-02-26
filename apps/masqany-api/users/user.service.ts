@@ -1,6 +1,10 @@
+import jwt from 'jsonwebtoken';
+import { secret } from "encore.dev/config";
 import OtpService from "../otp/otp.service";
-import { CreateUserDto, UpdateUserDto, UserResponse } from "./user.interface";
+import { CreateUserDto, OnboardingStep, UpdateUserDto, UserResponse, ValidateOtpDto } from "./user.interface";
 import { User } from "./user.model";
+
+const jwtSecret = secret('MAILGUN_API_KEY');
 
 const UserService = {
   count: async (): Promise<number> => {
@@ -15,7 +19,9 @@ const UserService = {
             const response = await OtpService.sendEmail(otpResponse.result?.otp);
             if(response.status === 200){
                 await User.update({
-                    ...otpResponse.result
+                    ...otpResponse.result,
+                    onboardingStep: OnboardingStep.otp, // next onboarding step
+
                 },{where: {id: user.dataValues.id}})
             }
         }
@@ -24,6 +30,27 @@ const UserService = {
       success: true,
       result: user.toJSON(),
     };
+  },
+  validateOtp: async ({email, otp}: ValidateOtpDto): Promise<UserResponse> => {
+    const user = await User.findOne({where: {email}});
+    if(user){
+      const response = OtpService.validateOtp({incomingOtp:otp, savedOtp:user.otp, expirationDate:user.expirationDate, otpUsed:user.otpUsed});
+      if(response.success){
+        user.otpUsed = true;
+        await user.save();
+        const token = UserService.createAccessToken(user.id, user.email, user.role)
+        return {
+          success: true,
+          result: {
+            accessToken: token
+          }
+        }
+      }
+    }
+    return {
+      success: false,
+      message: "unable to validate otp"
+    }
   },
   update: async (id: number, data: UpdateUserDto): Promise<UserResponse> => {
     const user = await User.findOne({ where: { id } });
@@ -60,7 +87,10 @@ const UserService = {
       result: "User deleted successfully",
     };
   },
-
+  createAccessToken: (id: number, email: string, role: string): string => {
+    const accessToken = jwt.sign({id, email, role}, Buffer.from(jwtSecret(), 'base64'), { expiresIn: '1h' });
+    return accessToken
+  }
 //   find: async (page?: number, limit?: number): Promise<UserResponse> => {
 //     let users: User[] = [];
 //     let pagination: any = undefined;

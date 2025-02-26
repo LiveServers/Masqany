@@ -31,6 +31,9 @@ export interface UserDto {
     role?: UserRole;
     location?: AvailableLocation;
     onboardingStep?: OnboardingStep;
+    otp?: string;
+    otpUsed?: boolean;
+    expirationDate?: Date;
 }
 
 export interface CreateUserDto {
@@ -55,11 +58,16 @@ export interface UpdateUserDto {
 export interface UserResponse {
     success: boolean;
     message?: string;
-    result?: UserDto | UserDto[] | string;
+    result?: UserDto | UserDto[] | string | Record<string, string>;
 }
 
 export interface Response {
     success: boolean;
     message?: string;
     result?: string | number;
+}
+
+export interface ValidateOtpDto {
+    email: string;
+    otp: string;
 }

@@ -4,6 +4,7 @@ import {
   Response,
   UpdateUserDto,
   UserResponse,
+  ValidateOtpDto,
 } from "./user.interface";
 import UserService from "./user.service";
 import { EMAIL_REGEX } from "./utils";
@@ -12,7 +13,7 @@ import { EMAIL_REGEX } from "./utils";
  * Counts and returns the number of existing users
  */
 export const count = api(
-  { expose: true, method: "GET", path: "/users/v1/count" },
+  { expose: true, auth: true, method: "GET", path: "/users/v1/count" },
   async (): Promise<Response> => {
     try {
       const result = await UserService.count();
@@ -46,11 +47,32 @@ export const create = api(
   }
 );
 
+/**
+ * Method to validate otp and create a token
+ */
+export const validateOtp = api(
+  { expose: true, method: "POST", path: "/users/v1/validate-otp" },
+  async (data: ValidateOtpDto): Promise<UserResponse> => {
+    try {
+      if (!data.email && !data.otp) {
+        throw APIError.invalidArgument("Missing fields");
+      }
+      if(!EMAIL_REGEX.test(data.email)){
+        throw APIError.invalidArgument("Invalid email");
+      }
+      const result = await UserService.validateOtp(data);
+      return result;
+    } catch (error) {
+      throw APIError.aborted(error?.toString() || "Error creating the user");
+    }
+  }
+);
+
 // /**
 //  * Update user data
 //  */
 export const update = api(
-  { expose: true, method: "PATCH", path: "/users/v1/:id" },
+  { expose: true, auth: true, method: "PATCH", path: "/users/v1/:id" },
   async ({
     id,
     data,
@@ -71,7 +93,7 @@ export const update = api(
  * Delete user by id
  */
 export const destroy = api(
-  { expose: true, method: "DELETE", path: "/users/v1/:id" },
+  { expose: true, auth: true, method: "DELETE", path: "/users/v1/:id" },
   async ({ id }: { id: number }): Promise<UserResponse> => {
     try {
       const result = await UserService.delete(id);
