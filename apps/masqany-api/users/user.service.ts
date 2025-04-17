@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { secret } from "encore.dev/config";
 import OtpService from "../otp/otp.service";
 import { CreateUserDto, OnboardingStep, UpdateUserDto, UserResponse, ValidateOtpDto } from "./user.interface";
-import { User } from "./user.model";
+import { User } from '../sequelize/database';
 
 const jwtSecret = secret('MAILGUN_API_KEY');
 
@@ -13,37 +13,45 @@ const UserService = {
   },
   create: async (data: CreateUserDto): Promise<UserResponse> => {
     const user = await User.create(data);
-    if(user){
+    const userData = user.get({plain: true});
+    if(userData){
         const otpResponse = await OtpService.generateOtp();
         if(otpResponse.result){
             const response = await OtpService.sendEmail(otpResponse.result?.otp);
             if(response.status === 200){
                 await User.update({
-                    ...otpResponse.result,
-                    onboardingStep: OnboardingStep.otp, // next onboarding step
+                    otp: otpResponse.result.otp,
+                    expiration_date: otpResponse.result.expirationDate,
+                    onboarding_step: OnboardingStep.otp,
 
-                },{where: {id: user.dataValues.id}})
+                },{where: {id: userData.id}})
             }
         }
     }
     return {
       success: true,
-      result: user.toJSON(),
+      result: userData,
     };
   },
   validateOtp: async ({email, otp}: ValidateOtpDto): Promise<UserResponse> => {
-    const user = await User.findOne({where: {email}});
-    if(user){
-      const response = OtpService.validateOtp({incomingOtp:otp, savedOtp:user.otp, expirationDate:user.expirationDate, otpUsed:user.otpUsed});
-      if(response.success){
-        user.otpUsed = true;
-        await user.save();
-        const token = UserService.createAccessToken(user.id, user.email, user.role)
-        return {
-          success: true,
-          result: {
-            accessToken: token
-          }
+    const user = await User.findOne({where: {email}, raw: true});
+    if(!user){
+      return {
+        success: false,
+        message: "unable to validate otp"
+      }
+    }
+    const response = OtpService.validateOtp({incomingOtp:otp, savedOtp:user.otp, expirationDate:user.expiration_date, otpUsed:user.otp_used});
+    if(response.success){
+      await User.update({
+        otpUsed: true,
+        onboarding_step: OnboardingStep.propertyDetails,
+      },{where: {id: user.id}});
+      const token = UserService.createAccessToken(user.id, user.email, user.role)
+      return {
+        success: true,
+        result: {
+          accessToken: token
         }
       }
     }
@@ -61,11 +69,11 @@ const UserService = {
       };
     }
     const {firstName, lastName, role, location, phoneNumber} = data;
-    user.firstName = firstName ?? user.firstName;
-    user.lastName = lastName ?? user.lastName
+    user.first_name = firstName ?? user.first_name;
+    user.last_name = lastName ?? user.last_name
     user.role = role ?? user.role;
     user.location = location ?? user.location;
-    user.phoneNumber = phoneNumber ?? user.phoneNumber; //TO-DO: send otp if phone number field is active
+    user.phone_number = phoneNumber ?? user.phone_number; //TO-DO: send otp if phone number field is active
 
     const updated = await user.save();
     return {
@@ -90,7 +98,9 @@ const UserService = {
   createAccessToken: (id: number, email: string, role: string): string => {
     const accessToken = jwt.sign({id, email, role}, Buffer.from(jwtSecret(), 'base64'), { expiresIn: '1h' });
     return accessToken
-  }
+  },
+  // ONBOARDING
+  
 //   find: async (page?: number, limit?: number): Promise<UserResponse> => {
 //     let users: User[] = [];
 //     let pagination: any = undefined;
