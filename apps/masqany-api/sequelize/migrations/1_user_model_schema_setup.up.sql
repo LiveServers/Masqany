@@ -1,10 +1,14 @@
 CREATE TABLE "user" (
     id BIGSERIAL PRIMARY KEY,
-    firstName TEXT,
-    lastName TEXT,
-    isVerified BOOLEAN,
-    location TEXT,
-    phoneNumber TEXT UNIQUE,
+    first_name TEXT,
+    last_name TEXT,
+    is_verified BOOLEAN,
+    location TEXT CHECK (
+        location IN (
+            'Kenya'
+        )
+    ),
+    phone_number TEXT UNIQUE,
     email TEXT NOT NULL UNIQUE,
     role TEXT DEFAULT 'Landlord' CHECK (
         role IN (            
@@ -17,14 +21,19 @@ CREATE TABLE "user" (
             'Other'
         )
     ),
-    onboardingStep TEXT DEFAULT 'signUp' CHECK (
-        onboardingStep IN (
+    onboarding_step TEXT DEFAULT 'signUp' CHECK (
+        onboarding_step IN (
             'signUp',
-            'personalDetails',
+            'otp',
             'propertyDetails',
-            'propertyAccess'
+            'propertyLocationDetails',
+            'propertyAccess',
+            'onboardingComplete'
         )
     ),
+    otp TEXT,
+    expiration_date TIMESTAMP,
+    otp_used BOOLEAN DEFAULT false,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )

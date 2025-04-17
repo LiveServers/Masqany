@@ -15,9 +15,10 @@ export enum AvailableLocation {
 export enum OnboardingStep {
     signUp = 'signUp',
     otp = 'otp',
-    personalDetails = 'personalDetails',
     propertyDetails = 'propertyDetails',
-    propertyAccess = 'propertyAccess'
+    propertyLocationDetails = 'propertyLocationDetails',
+    propertyAccess = 'propertyAccess',
+    onboardingComplete = 'onboardingComplete'
 }
 
 // dto

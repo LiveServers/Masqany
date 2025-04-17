@@ -21,28 +21,28 @@ const OtpService = {
         };
     },
     validateOtp: (dto: ValidateOtpDto): OtpResponse => {
-            if(dto?.otpUsed){
-                return {
-                    success: false,
-                    message: 'Otp has been used'
-                }
-            }
-            if(dto.savedOtp !== dto.incomingOtp){
-                return {
-                    success: false,
-                    message: 'Otp is invalid'
-                }
-            }
-            if(dto.expirationDate > new Date()){
-                return {
-                    success: true,
-                    message: 'Otp is valid'
-                }
-            }
+        if(dto?.otpUsed){
             return {
                 success: false,
-                message: 'Otp has expired'
+                message: 'Otp has been used'
             }
+        }
+        if(dto.savedOtp !== dto.incomingOtp){
+            return {
+                success: false,
+                message: 'Otp is invalid'
+            }
+        }
+        if(dto.expirationDate > new Date()){
+            return {
+                success: true,
+                message: 'Otp is valid'
+            }
+        }
+        return {
+            success: false,
+            message: 'Otp has expired'
+        }
     },
     sendEmail: async (otp: string): Promise<SendEmailResponse> => {
         try {
