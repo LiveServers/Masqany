@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "docs": "open http://localhost:3000/docs",
-    "lint": "eslint src",
+    "lint": "eslint .",
     "lint:fix": "npm run lint --fix",
     "start": "dotenv run -- node dist/index.js",
     "typecheck": "tsc"

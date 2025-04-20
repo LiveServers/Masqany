@@ -1,21 +1,24 @@
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
   root: true,
-  extends: ['universe'],
-  plugins: ['unused-imports', 'simple-import-sort'],
+  parser: '@typescript-eslint/parser',
+  extends: ['universe', 'plugin:prettier/recommended'],
+  plugins: ['unused-imports', 'simple-import-sort', '@typescript-eslint', 'prettier'],
   rules: {
     '@typescript-eslint/consistent-type-imports': 'error',
     '@typescript-eslint/consistent-indexed-object-style': 'error',
     '@typescript-eslint/consistent-type-definitions': 'error',
-    '@typescript-eslint/no-empty-object-type': 'error',
-    '@typescript-eslint/no-wrapper-object-types': 'warn',
     'import/first': 'error',
     'import/newline-after-import': 'error',
     'import/no-duplicates': 'error',
+    'import/no-unresolved': 'warn',
     'import/no-unresolved': 'error',
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
     'unused-imports/no-unused-imports': 'error',
+    '@typescript-eslint/no-empty-object-type': 'off',
+    '@typescript-eslint/no-wrapper-object-types': 'off',
+    'prettier/prettier': 'error',
     'unused-imports/no-unused-vars': [
       'error',
       {
