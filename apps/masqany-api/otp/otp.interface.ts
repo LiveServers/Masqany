@@ -1,22 +1,22 @@
 export interface ValidateOtpDto {
-    incomingOtp: string;
-    savedOtp: string;
-    expirationDate: Date;
-    otpUsed: boolean;
+  incomingOtp: string;
+  savedOtp: string;
+  expirationDate: Date;
+  otpUsed: boolean;
 }
 
 interface OtpDto {
-    otp: string;
-    expirationDate: Date
+  otp: string;
+  expirationDate: Date;
 }
 
 export interface OtpResponse {
-    success: boolean;
-    message?: string;
-    result?: OtpDto;
+  success: boolean;
+  message?: string;
+  result?: OtpDto;
 }
 
 export interface SendEmailResponse {
-    status: number,
-    message?: string;
+  status: number;
+  message?: string;
 }

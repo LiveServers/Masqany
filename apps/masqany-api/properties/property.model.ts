@@ -7,7 +7,7 @@
 //     Sequelize,
 //   } from "sequelize";
 // import { KenyanCounties, PropertType, SupportedCountries } from "./property.interface";
-  
+
 // class Property extends Model<InferAttributes<Property>, InferCreationAttributes<Property>> {
 //     declare id: CreationOptional<number>;
 //     declare propertyType: PropertType;
@@ -69,63 +69,69 @@
 // }
 
 // export { Property };
-import { Sequelize, DataTypes } from "sequelize";
-import { KenyanCounties, PropertType, SupportedCountries } from "./property.interface";
+import type { Sequelize } from 'sequelize';
+import { DataTypes } from 'sequelize';
+
+import { KenyanCounties, PropertType, SupportedCountries } from './property.interface';
 
 export const PropertyModel = (sequelize: Sequelize) => {
-  const Property = sequelize.define('Property', {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
+  const Property = sequelize.define(
+    'Property',
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+      },
 
-    property_type: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        isIn: [Object.values(PropertType)],
+      property_type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          isIn: [Object.values(PropertType)],
+        },
+      },
+
+      property_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+
+      description: {
+        type: DataTypes.STRING,
+      },
+
+      physical_address: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+
+      country_of_property: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        validate: {
+          isIn: [Object.values(SupportedCountries)],
+        },
+      },
+
+      county_of_property: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        validate: {
+          isIn: [Object.values(KenyanCounties)],
+        },
+      },
+
+      locality: {
+        type: DataTypes.STRING,
+        allowNull: true,
       },
     },
-
-    property_name: {
-      type: DataTypes.STRING,
-      allowNull: false,
+    {
+      tableName: 'property',
+      timestamps: false,
     },
-
-    description: {
-      type: DataTypes.STRING,
-    },
-
-    physical_address: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-
-    country_of_property: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      validate: {
-        isIn: [Object.values(SupportedCountries)],
-      },
-    },
-
-    county_of_property: {
-      type: DataTypes.STRING,
-      allowNull: true,
-      validate: {
-        isIn: [Object.values(KenyanCounties)],
-      },
-    },
-
-    locality: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-  }, {
-    tableName: 'property',
-    timestamps: false,
-  });
+  );
 
   return Property;
 };

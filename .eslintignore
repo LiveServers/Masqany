@@ -1,0 +1,17 @@
+# Ignore node_modules (already ignored by default)
+node_modules/
+
+# Ignore build output
+dist/
+build/
+out/
+
+# Ignore specific directories
+tooling/
+scripts/
+apps/docs/
+
+#encore
+.encore/
+auth/
+encore.gen/

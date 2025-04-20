@@ -1,12 +1,12 @@
-import jwt, { type JwtPayload } from 'jsonwebtoken'
-import { APIError, Gateway, Header } from "encore.dev/api";
-import { authHandler } from "encore.dev/auth";
-import { secret } from "encore.dev/config";
-
-import log from "encore.dev/log";
+import type { Header } from 'encore.dev/api';
+import { APIError, Gateway } from 'encore.dev/api';
+import { authHandler } from 'encore.dev/auth';
+import { secret } from 'encore.dev/config';
+import log from 'encore.dev/log';
+import jwt, { type JwtPayload } from 'jsonwebtoken';
 
 interface AuthParams {
-  authorization: Header<"Authorization">;
+  authorization: Header<'Authorization'>;
 }
 
 interface AuthData {
@@ -18,10 +18,10 @@ interface AuthData {
 const jwtSecret = secret('MAILGUN_API_KEY');
 
 const myAuthHandler = authHandler(async (params: AuthParams): Promise<AuthData> => {
-  const token = params.authorization.replace("Bearer ", "");
+  const token = params.authorization.replace('Bearer ', '');
 
   if (!token) {
-    throw APIError.unauthenticated("no token provided");
+    throw APIError.unauthenticated('no token provided');
   }
 
   try {
@@ -29,13 +29,13 @@ const myAuthHandler = authHandler(async (params: AuthParams): Promise<AuthData> 
     await jwt.verify(token, Buffer.from(jwtSecret(), 'base64'));
 
     return {
-        userID: decoded.payload.id,
-        email: decoded.payload.email,
-        role: decoded.payload.role ?? ''
+      userID: decoded.payload.id,
+      email: decoded.payload.email,
+      role: decoded.payload.role ?? '',
     };
   } catch (e) {
     log.error(e);
-    throw APIError.unauthenticated("invalid token", e as Error);
+    throw APIError.unauthenticated('invalid token', e as Error);
   }
 });
 
