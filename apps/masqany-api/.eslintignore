@@ -13,5 +13,4 @@ apps/docs/
 
 #encore
 .encore/
-auth/
 encore.gen/
