@@ -119,6 +119,7 @@ const PropertyService = {
     await response.update(
       {
         onboarding_step: OnboardingStep.onboardingComplete,
+        is_verified: true,
       },
       { where: { id } },
     );

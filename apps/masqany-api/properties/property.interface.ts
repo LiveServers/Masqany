@@ -73,6 +73,19 @@ export interface PropertyDto {
   locality?: string;
 }
 
+export interface PropertyAttributes {
+  id: number;
+  property_type: PropertType;
+  property_name: string;
+  description?: string;
+  physical_address: string;
+  country_of_property?: SupportedCountries;
+  county_of_property?: KenyanCounties;
+  locality?: string;
+}
+
+export interface PropertyCreationAttributes extends Omit<PropertyAttributes, 'id'> {}
+
 export interface CreatePropertyDto {
   firstName: string;
   lastName: string;
@@ -97,7 +110,13 @@ export interface PropertyAccessDto {
 export interface PropertyResponse {
   success: boolean;
   message?: string;
-  result?: PropertyDto | PropertyDto[] | string | Record<string, string> | string[];
+  result?:
+    | PropertyDto
+    | PropertyDto[]
+    | string
+    | Record<string, string>
+    | string[]
+    | PropertyAttributes;
 }
 
 type UniquesKeys = 'countryOfProperty' | 'countyOfProperty' | 'locality';

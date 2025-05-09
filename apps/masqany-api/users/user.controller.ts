@@ -2,7 +2,10 @@ import { api, APIError } from 'encore.dev/api';
 
 import type {
   CreateUserDto,
-  Response,
+  RefreshTokenBody,
+  RefreshTokenResponseWithCookies,
+  Response as ResObject,
+  SignInResponseWithCookies,
   UpdateUserDto,
   UserResponse,
   ValidateOtpDto,
@@ -10,12 +13,14 @@ import type {
 import UserService from './user.service';
 import { EMAIL_REGEX } from './utils';
 
+import { getAuthData } from '~encore/auth';
+
 /**
  * Counts and returns the number of existing users
  */
 export const count = api(
   { expose: true, auth: true, method: 'GET', path: '/users/v1/count' },
-  async (): Promise<Response> => {
+  async (): Promise<ResObject> => {
     try {
       const result = await UserService.count();
       return { success: true, result };
@@ -67,9 +72,9 @@ export const validateOtp = api(
   },
 );
 
-// /**
-//  * Update user data
-//  */
+/**
+ * Update user data
+ */
 export const update = api(
   { expose: true, auth: true, method: 'PATCH', path: '/users/v1/:id' },
   async ({ id, data }: { id: number; data: UpdateUserDto }): Promise<UserResponse> => {
@@ -97,39 +102,104 @@ export const destroy = api(
   },
 );
 
-// /**
-//  * Get all users data
-//  */
-// export const read = api(
-//   { expose: true, method: "GET", path: "/users" },
-//   async ({
-//     page,
-//     limit,
-//   }: {
-//     page?: number;
-//     limit?: number;
-//   }): Promise<UserResponse> => {
-//     try {
-//       const result = await UserService.find(page, limit);
-//       return result;
-//     } catch (error) {
-//       throw APIError.aborted(error?.toString() || "Error getting users data");
-//     }
-//   }
-// );
+/**
+ * sign in user
+ */
+export const signIn = api(
+  { expose: true, method: 'POST', path: '/users/v1/sign-in' },
+  async ({ email, otp }: { email: string; otp: string }): Promise<SignInResponseWithCookies> => {
+    try {
+      if (!email && !otp) {
+        throw APIError.invalidArgument('Missing fields');
+      }
+      if (!EMAIL_REGEX.test(email)) {
+        throw APIError.invalidArgument('Invalid email');
+      }
+      const response = await UserService.signIn(email, otp);
+      if (response.result) {
+        const { refreshToken, accessToken, user } = response.result;
+        return {
+          accessToken,
+          user,
+          cookie: `refreshToken=${refreshToken}; HttpOnly; Path=/; SameSite=Strict; Max-Age=${60 * 60 * 24 * 7}`,
+        };
+      }
+      throw APIError.unauthenticated('Invalid email or password');
+    } catch (error) {
+      throw APIError.aborted(error?.toString() || 'Error signing in user');
+    }
+  },
+);
 
-// /**
-//  * Get user data by id
-//  */
-// export const readOne = api(
-//   { expose: true, method: "GET", path: "/users/:id" },
-//   async ({ id }: { id: number }): Promise<UserResponse> => {
-//     try {
-//       const result = await UserService.findOne(id);
-//       return result;
-//     } catch (error) {
-//       throw APIError.aborted(error?.toString() || "Error getting user data");
-//     }
-//   }
-// );
-// );
+/**
+ * refresh token
+ */
+export const refreshToken = api(
+  { expose: true, method: 'POST', path: '/users/v1/refresh-token/:id', auth: true },
+  async ({
+    id,
+  }: {
+    id: number;
+    data: RefreshTokenBody;
+  }): Promise<RefreshTokenResponseWithCookies> => {
+    try {
+      const refreshToken = getAuthData()?.refreshToken;
+      if (!refreshToken) {
+        throw APIError.unauthenticated('An error occurred, please sign in again');
+      }
+      if (!id) {
+        throw APIError.invalidArgument('Missing fields');
+      }
+      const response = await UserService.refreshToken(id, refreshToken);
+      if (response.result) {
+        const { refreshToken: token, accessToken } = response.result;
+        return {
+          accessToken,
+          cookie: `refreshToken=${token}; HttpOnly; Path=/; SameSite=Strict; Max-Age=${60 * 60 * 24 * 7}`,
+        };
+      }
+      throw APIError.internal('An error occurred, please sign in again');
+    } catch (error) {
+      throw APIError.aborted(error?.toString() || 'Error refreshing token');
+    }
+  },
+);
+
+/**
+ * send otp
+ */
+export const sendOtp = api(
+  { expose: true, method: 'POST', path: '/users/v1/send-otp' },
+  async ({ email }: { email: string }): Promise<UserResponse> => {
+    try {
+      if (!email) {
+        throw APIError.invalidArgument('Missing fields');
+      }
+      if (!EMAIL_REGEX.test(email)) {
+        throw APIError.invalidArgument('Invalid email');
+      }
+      const result = await UserService.sendOtp(email);
+      return result;
+    } catch (error) {
+      throw APIError.aborted(error?.toString() || 'Error sending otp');
+    }
+  },
+);
+
+/**
+ * sign out user
+ */
+export const signOut = api(
+  { expose: true, method: 'POST', path: '/users/v1/sign-out:id', auth: true },
+  async ({ id }: { id: number }): Promise<UserResponse> => {
+    try {
+      if (!id) {
+        throw APIError.invalidArgument('Missing fields');
+      }
+      const result = await UserService.signOut(id);
+      return result;
+    } catch (error) {
+      throw APIError.aborted(error?.toString() || 'Error signing out user');
+    }
+  },
+);

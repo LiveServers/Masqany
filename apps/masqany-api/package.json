@@ -39,6 +39,7 @@
     "@ts-rest/fastify": "3.51.0",
     "@ts-rest/open-api": "3.51.0",
     "close-with-grace": "2.1.0",
+    "cookie": "1.0.2",
     "date-fns": "4.1.0",
     "encore.dev": "1.45.4",
     "form-data": "4.0.2",

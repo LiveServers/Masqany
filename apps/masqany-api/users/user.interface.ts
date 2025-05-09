@@ -1,3 +1,5 @@
+import type { Header } from 'encore.dev/api';
+
 export enum UserRole {
   Landlord = 'Landlord',
   PropertyManager = 'Property Manager',
@@ -35,7 +37,26 @@ export interface UserDto {
   otp?: string;
   otpUsed?: boolean;
   expirationDate?: Date;
+  signed_out?: boolean;
 }
+
+export interface UserAttributes {
+  id: number;
+  first_name?: string;
+  last_name?: string;
+  email: string;
+  is_verified?: boolean;
+  phone_number?: string;
+  role?: UserRole;
+  location?: AvailableLocation;
+  onboarding_step?: OnboardingStep;
+  otp?: string;
+  otp_used?: boolean;
+  expiration_date?: Date;
+  signed_out?: boolean;
+}
+
+export interface UserCreationAttributes extends Omit<UserAttributes, 'id'> {}
 
 export interface CreateUserDto {
   firstName?: string;
@@ -56,10 +77,28 @@ export interface UpdateUserDto {
   location?: AvailableLocation;
 }
 
-export interface UserResponse {
+interface BaseUserResponse {
   success: boolean;
   message?: string;
+}
+
+export interface UserResponse extends BaseUserResponse {
   result?: UserDto | UserDto[] | string | Record<string, string>;
+}
+
+export interface UserResponseWithToken extends BaseUserResponse {
+  result?: {
+    accessToken: string;
+    refreshToken: string;
+    user: UserDto;
+  };
+}
+
+export interface RefreshTokenResponse extends BaseUserResponse {
+  result?: {
+    accessToken: string;
+    refreshToken: string;
+  };
 }
 
 export interface Response {
@@ -71,4 +110,24 @@ export interface Response {
 export interface ValidateOtpDto {
   email: string;
   otp: string;
+}
+
+export interface Token {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface RefreshTokenBody {
+  refreshToken: string;
+}
+
+export interface SignInResponseWithCookies {
+  cookie: Header<'Set-Cookie'>;
+  accessToken: string;
+  user: UserDto;
+}
+
+export interface RefreshTokenResponseWithCookies {
+  cookie: Header<'Set-Cookie'>;
+  accessToken: string;
 }
