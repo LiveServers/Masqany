@@ -32,15 +32,18 @@ const myAuthHandler = authHandler(async (params: AuthParams): Promise<AuthData> 
   }
 
   try {
+    await jwt.verify(token, Buffer.from(jwtSecret(), 'base64'));
     const decoded = jwt.decode(token, { complete: true }) as JwtPayload;
+
     const user = await User.findOne({ where: { id: decoded.payload.id }, raw: true });
+
     if (!user) {
       throw APIError.unauthenticated('user not found');
     }
+
     if (user.signed_out) {
       throw APIError.unauthenticated('user signed out');
     }
-    await jwt.verify(token, Buffer.from(jwtSecret(), 'base64'));
 
     return {
       userID: decoded.payload.id,
