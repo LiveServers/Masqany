@@ -3,6 +3,7 @@ import { Sequelize } from 'sequelize';
 
 import { PropertyModel } from '../properties/property.model';
 import { UserModel } from '../users/user.model';
+import { UnitModel } from '../units/unit.model';
 
 const DB = new SQLDatabase('masqany-test-db', {
   migrations: './migrations',
@@ -17,6 +18,7 @@ const sequelize = new Sequelize(DB.connectionString, {
 
 const User = UserModel(sequelize);
 const Property = PropertyModel(sequelize);
+const Unit = UnitModel(sequelize);
 
 Property.belongsToMany(User, {
   through: 'user_properties',
@@ -25,6 +27,7 @@ Property.belongsToMany(User, {
   otherKey: 'user_id',
   timestamps: false,
 });
+
 User.belongsToMany(Property, {
   through: 'user_properties',
   as: 'properties',
@@ -33,4 +36,14 @@ User.belongsToMany(Property, {
   timestamps: false,
 });
 
-export { Property, sequelize, User };
+Property.hasMany(Unit, {
+  foreignKey: 'property_id',
+  as: 'units',
+});
+
+Unit.belongsTo(Property, {
+  foreignKey: 'property_id',
+  as: 'properties',
+});
+
+export { Property, sequelize, User, Unit };

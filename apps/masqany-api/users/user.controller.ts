@@ -2,7 +2,6 @@ import { api, APIError } from 'encore.dev/api';
 
 import type {
   CreateUserDto,
-  RefreshTokenBody,
   RefreshTokenResponseWithCookies,
   Response as ResObject,
   SignInResponseWithCookies,
@@ -140,7 +139,6 @@ export const refreshToken = api(
     id,
   }: {
     id: number;
-    data: RefreshTokenBody;
   }): Promise<RefreshTokenResponseWithCookies> => {
     try {
       const refreshToken = getAuthData()?.refreshToken;
