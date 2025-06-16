@@ -93,13 +93,14 @@ const UserService = {
       throw APIError.notFound('User not found');
     }
     const userData = user.get({ plain: true });
-    // if (user.onboarding_step !== OnboardingStep.propertyAccess) {
-    //   throw APIError.aborted('User is not onboarded');
-    // }
+    
+    if (userData.onboarding_step !== OnboardingStep.propertyAccess) {
+      throw APIError.aborted('User is not onboarded');
+    }
 
-    // if (user.is_verified) {
-    //   throw APIError.aborted('User is not verified');
-    // }
+    if (userData.is_verified) {
+      throw APIError.aborted('User is not verified');
+    }
 
     const response = OtpService.validateOtp({
       incomingOtp: otp,
