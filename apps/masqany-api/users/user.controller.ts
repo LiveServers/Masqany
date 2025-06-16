@@ -3,26 +3,27 @@ import { api, APIError } from 'encore.dev/api';
 import type {
   CreateUserDto,
   RefreshTokenResponseWithCookies,
-  Response as ResObject,
   SignInResponseWithCookies,
+  Token,
   UpdateUserDto,
-  UserResponse,
+  UserAttributes,
   ValidateOtpDto,
 } from './user.interface';
 import UserService from './user.service';
 import { EMAIL_REGEX } from './utils';
 
 import { getAuthData } from '~encore/auth';
+import { ApiResponse, success } from "../utils/response";
 
 /**
  * Counts and returns the number of existing users
  */
 export const count = api(
   { expose: true, auth: true, method: 'GET', path: '/users/v1/count' },
-  async (): Promise<ResObject> => {
+  async (): Promise<ApiResponse<number>> => {
     try {
       const result = await UserService.count();
-      return { success: true, result };
+      return success(result, 'Count of existing users');
     } catch (error) {
       throw APIError.aborted(error?.toString() || 'Error counting existing users');
     }
@@ -34,7 +35,7 @@ export const count = api(
  */
 export const create = api(
   { expose: true, method: 'POST', path: '/users/v1/create' },
-  async (data: CreateUserDto): Promise<UserResponse> => {
+  async (data: CreateUserDto): Promise<ApiResponse<UserAttributes>> => {
     try {
       if (!data.email) {
         throw APIError.invalidArgument('Missing fields');
@@ -43,7 +44,7 @@ export const create = api(
         throw APIError.invalidArgument('Invalid email');
       }
       const result = await UserService.create(data);
-      return result;
+      return success(result, 'User created successfully');
     } catch (error) {
       throw APIError.aborted(error?.toString() || 'Error creating the user');
     }
@@ -55,7 +56,7 @@ export const create = api(
  */
 export const validateOtp = api(
   { expose: true, method: 'POST', path: '/users/v1/validate-otp' },
-  async (data: ValidateOtpDto): Promise<UserResponse> => {
+  async (data: ValidateOtpDto): Promise<ApiResponse<Token>> => {
     try {
       if (!data.email && !data.otp) {
         throw APIError.invalidArgument('Missing fields');
@@ -64,7 +65,7 @@ export const validateOtp = api(
         throw APIError.invalidArgument('Invalid email');
       }
       const result = await UserService.validateOtp(data);
-      return result;
+      return success(result, 'OTP validated successfully');
     } catch (error) {
       throw APIError.aborted(error?.toString() || 'Error creating the user');
     }
@@ -76,10 +77,10 @@ export const validateOtp = api(
  */
 export const update = api(
   { expose: true, auth: true, method: 'PATCH', path: '/users/v1/:id' },
-  async ({ id, data }: { id: number; data: UpdateUserDto }): Promise<UserResponse> => {
+  async ({ id, data }: { id: number; data: UpdateUserDto }): Promise<ApiResponse<UserAttributes>> => {
     try {
       const result = await UserService.update(id, data);
-      return result;
+      return success(result, 'User updated successfully');
     } catch (error) {
       throw APIError.aborted(error?.toString() || 'Error updating user');
     }
@@ -91,10 +92,10 @@ export const update = api(
  */
 export const destroy = api(
   { expose: true, auth: true, method: 'DELETE', path: '/users/v1/:id' },
-  async ({ id }: { id: number }): Promise<UserResponse> => {
+  async ({ id }: { id: number }): Promise<ApiResponse<void>> => {
     try {
-      const result = await UserService.delete(id);
-      return result;
+      await UserService.delete(id);
+      return success(undefined, 'User deleted successfully');
     } catch (error) {
       throw APIError.aborted(error?.toString() || 'Error deleting user');
     }
@@ -106,7 +107,7 @@ export const destroy = api(
  */
 export const signIn = api(
   { expose: true, method: 'POST', path: '/users/v1/sign-in' },
-  async ({ email, otp }: { email: string; otp: string }): Promise<SignInResponseWithCookies> => {
+  async ({ email, otp }: { email: string; otp: string }): Promise<ApiResponse<SignInResponseWithCookies>> => {
     try {
       if (!email && !otp) {
         throw APIError.invalidArgument('Missing fields');
@@ -115,13 +116,16 @@ export const signIn = api(
         throw APIError.invalidArgument('Invalid email');
       }
       const response = await UserService.signIn(email, otp);
-      if (response.result) {
-        const { refreshToken, accessToken, user } = response.result;
-        return {
-          accessToken,
-          user,
-          cookie: `refreshToken=${refreshToken}; HttpOnly; Path=/; SameSite=Strict; Max-Age=${60 * 60 * 24 * 7}`,
-        };
+      if (response) {
+        const { refreshToken, accessToken, user } = response;
+        return success(
+          {
+            accessToken,
+            cookie: `refreshToken=${refreshToken}; HttpOnly; Path=/; SameSite=Strict; Max-Age=${60 * 60 * 24 * 7}`,
+            user,
+          },
+          'User signed in successfully',
+        );
       }
       throw APIError.unauthenticated('Invalid email or password');
     } catch (error) {
@@ -139,7 +143,7 @@ export const refreshToken = api(
     id,
   }: {
     id: number;
-  }): Promise<RefreshTokenResponseWithCookies> => {
+  }): Promise<ApiResponse<RefreshTokenResponseWithCookies>> => {
     try {
       const refreshToken = getAuthData()?.refreshToken;
       if (!refreshToken) {
@@ -151,10 +155,13 @@ export const refreshToken = api(
       const response = await UserService.refreshToken(id, refreshToken);
       if (response.result) {
         const { refreshToken: token, accessToken } = response.result;
-        return {
-          accessToken,
-          cookie: `refreshToken=${token}; HttpOnly; Path=/; SameSite=Strict; Max-Age=${60 * 60 * 24 * 7}`,
-        };
+        return success(
+          {
+            accessToken,
+            cookie: `refreshToken=${token}; HttpOnly; Path=/; SameSite=Strict; Max-Age=${60 * 60 * 24 * 7}`,
+          },
+          'Token refresh successful',
+        );
       }
       throw APIError.internal('An error occurred, please sign in again');
     } catch (error) {
@@ -168,7 +175,7 @@ export const refreshToken = api(
  */
 export const sendOtp = api(
   { expose: true, method: 'POST', path: '/users/v1/send-otp' },
-  async ({ email }: { email: string }): Promise<UserResponse> => {
+  async ({ email }: { email: string }): Promise<ApiResponse<string>> => {
     try {
       if (!email) {
         throw APIError.invalidArgument('Missing fields');
@@ -177,7 +184,7 @@ export const sendOtp = api(
         throw APIError.invalidArgument('Invalid email');
       }
       const result = await UserService.sendOtp(email);
-      return result;
+      return success(result, 'OTP sent successfully');
     } catch (error) {
       throw APIError.aborted(error?.toString() || 'Error sending otp');
     }
@@ -189,13 +196,13 @@ export const sendOtp = api(
  */
 export const signOut = api(
   { expose: true, method: 'POST', path: '/users/v1/sign-out:id', auth: true },
-  async ({ id }: { id: number }): Promise<UserResponse> => {
+  async ({ id }: { id: number }): Promise<ApiResponse<void>> => {
     try {
       if (!id) {
         throw APIError.invalidArgument('Missing fields');
       }
-      const result = await UserService.signOut(id);
-      return result;
+      await UserService.signOut(id);
+      return success(undefined, 'User signed out successfully');
     } catch (error) {
       throw APIError.aborted(error?.toString() || 'Error signing out user');
     }

@@ -86,12 +86,10 @@ export interface UserResponse extends BaseUserResponse {
   result?: UserDto | UserDto[] | string | Record<string, string>;
 }
 
-export interface UserResponseWithToken extends BaseUserResponse {
-  result?: {
-    accessToken: string;
-    refreshToken: string;
-    user: UserDto;
-  };
+export interface UserResponseWithToken {
+  accessToken: string;
+  refreshToken: string;
+  user: UserDto;
 }
 
 export interface RefreshTokenResponse extends BaseUserResponse {

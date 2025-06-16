@@ -84,3 +84,7 @@ export interface CreateUnitDto {
 }
 
 export type UnitInstance = Model<UnitAttributes, UnitCreationAttributes>;
+
+export interface DeleteUnitResponse {
+    message: string;
+}
