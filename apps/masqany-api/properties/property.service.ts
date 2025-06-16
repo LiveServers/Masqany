@@ -1,17 +1,15 @@
-import type { PropertyAccessDto, PropertyDetailsDto, PropertyLocationDetailsDto, PropertyResponse} from './property.interface';
+import type { KenyanCountiesValue, PropertyAccessDto, PropertyAttributes, PropertyDetailsDto, PropertyLocationDetailsDto, PropertyResponse, SupportedCountryValue} from './property.interface';
 import { Property, User } from '../sequelize/database';
 import { OnboardingStep } from '../users/user.interface';
 import { KenyanCounties, SupportedCountries } from './property.interface';
+import { APIError } from 'encore.dev/api';
 
 const PropertyService = {
-  addPropertyDetails: async (data: PropertyDetailsDto, id: string): Promise<PropertyResponse> => {
+  addPropertyDetails: async (data: PropertyDetailsDto, id: string): Promise<PropertyAttributes> => {
     const { firstName, lastName, role, ...rest } = data;
     const user = await User.findByPk(id);
     if (!user) {
-      return {
-        success: false,
-        message: 'User not found',
-      };
+      throw APIError.notFound('User not found');
     }
     await user.update({
       first_name: firstName,
@@ -25,44 +23,28 @@ const PropertyService = {
       physical_address: rest.physicalAddress,
     });
     if (!property) {
-      return {
-        success: false,
-        message: 'Could not create property',
-      };
+      throw APIError.aborted('Could not create property');
     }
     await user.addProperty(property);
     await user.update({
       onboarding_step: OnboardingStep.propertyLocationDetails,
     });
-    return {
-      success: true,
-      message: 'Created property details',
-      result: property.toJSON(),
-    };
+    return property.get({plain: true});
   },
-  getAvailableCountries: async (): Promise<PropertyResponse> => {
-    return {
-      success: true,
-      result: Object.values(SupportedCountries),
-    };
+  getAvailableCountries: async (): Promise<SupportedCountryValue[]> => {
+    return Object.values(SupportedCountries)
   },
-  getAvailableCounties: async (): Promise<PropertyResponse> => {
-    return {
-      success: true,
-      result: Object.values(KenyanCounties),
-    };
+  getAvailableCounties: async (): Promise<KenyanCountiesValue[]> => {
+    return Object.values(KenyanCounties)
   },
   addPropertyLocationDetails: async (
     data: PropertyLocationDetailsDto,
     id: string,
     propertyId: number,
-  ): Promise<PropertyResponse> => {
+  ): Promise<string> => {
     const property = await Property.findByPk(propertyId);
     if (!property) {
-      return {
-        success: false,
-        message: 'Could not update property',
-      };
+      throw APIError.notFound('Property not found');
     }
     await property.update({
       country_of_property: data.countryOfProperty,
@@ -76,24 +58,18 @@ const PropertyService = {
       },
     });
     if (!user) {
-      return {
-        success: false,
-        message: 'Could not update property',
-      };
+      throw APIError.notFound('User not found');
     }
     await user.update({
       onboarding_step: OnboardingStep.propertyAccess,
     });
-    return {
-      success: true,
-      message: 'Added property location details',
-    };
+    return 'Added property location details'
   },
   addPropertyAccess: async (
     data: PropertyAccessDto,
     id: string,
     propertyId: number,
-  ): Promise<PropertyResponse> => {
+  ): Promise<string> => {
     const response = await User.create({
       first_name: data.firstName,
       last_name: data.lastName,
@@ -103,17 +79,11 @@ const PropertyService = {
     });
     const user = response.get({ plain: true });
     if (!user) {
-      return {
-        success: false,
-        message: 'Could not update property',
-      };
+      throw APIError.notFound('User not found');
     }
     const property = await Property.findByPk(propertyId);
     if (!property) {
-      return {
-        success: false,
-        message: 'Could not update property',
-      };
+      throw APIError.notFound('Property not found');
     }
     await property.addUser(response);
     await response.update(
@@ -123,10 +93,7 @@ const PropertyService = {
       },
       { where: { id } },
     );
-    return {
-      success: true,
-      message: 'Added property access details',
-    };
+    return 'Added property access details'
   },
 };
 

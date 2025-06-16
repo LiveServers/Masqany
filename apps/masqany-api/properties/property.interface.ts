@@ -10,7 +10,10 @@ export enum PropertType {
 
 export enum SupportedCountries {
   Kenya = 'Kenya',
+    Other = 'Other',
 }
+
+export type SupportedCountryValue = (typeof SupportedCountries)[keyof typeof SupportedCountries];
 
 export enum KenyanCounties {
   Baringo = 'Baringo',
@@ -61,6 +64,8 @@ export enum KenyanCounties {
   Wajir = 'Wajir',
   WestPokot = 'West Pokot',
 }
+
+export type KenyanCountiesValue = (typeof KenyanCounties)[keyof typeof KenyanCounties];
 
 export interface PropertyDto {
   id: number;
